@@ -41,23 +41,23 @@ pub struct ConsensusClient<R: ConsensusRpc, DB: Database> {
 
 #[derive(Debug)]
 pub struct Inner<R: ConsensusRpc> {
-    rpc: R,
-    store: LightClientStore,
-    last_checkpoint: Option<Vec<u8>>,
-    block_send: Sender<Block>,
-    finalized_block_send: watch::Sender<Option<Block>>,
-    checkpoint_send: watch::Sender<Option<Vec<u8>>>,
+    pub rpc: R,
+    pub store: LightClientStore,
+    pub last_checkpoint: Option<Vec<u8>>,
+    pub block_send: Sender<Block>,
+    pub finalized_block_send: watch::Sender<Option<Block>>,
+    pub checkpoint_send: watch::Sender<Option<Vec<u8>>>,
     pub config: Arc<Config>,
 }
 
 #[derive(Debug, Default)]
-struct LightClientStore {
-    finalized_header: Header,
-    current_sync_committee: SyncCommittee,
-    next_sync_committee: Option<SyncCommittee>,
-    optimistic_header: Header,
-    previous_max_active_participants: u64,
-    current_max_active_participants: u64,
+pub struct LightClientStore {
+    pub finalized_header: Header,
+    pub current_sync_committee: SyncCommittee,
+    pub next_sync_committee: Option<SyncCommittee>,
+    pub optimistic_header: Header,
+    pub previous_max_active_participants: u64,
+    pub current_max_active_participants: u64,
 }
 
 impl<R: ConsensusRpc, DB: Database> ConsensusClient<R, DB> {
@@ -366,7 +366,7 @@ impl<R: ConsensusRpc> Inner<R> {
         Duration::try_seconds(next_update as i64).unwrap()
     }
 
-    async fn bootstrap(&mut self, checkpoint: &[u8]) -> Result<()> {
+    pub async fn bootstrap(&mut self, checkpoint: &[u8]) -> Result<()> {
         let mut bootstrap = self
             .rpc
             .get_bootstrap(checkpoint)
@@ -500,7 +500,7 @@ impl<R: ConsensusRpc> Inner<R> {
         Ok(())
     }
 
-    fn verify_update(&self, update: &Update) -> Result<()> {
+    pub fn verify_update(&self, update: &Update) -> Result<()> {
         let update = GenericUpdate::from(update);
         self.verify_generic_update(&update)
     }
