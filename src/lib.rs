@@ -53,6 +53,7 @@
 pub mod client {
     pub use client::{Client, ClientBuilder};
     pub use consensus::database::*;
+    pub use consensus::*;
 }
 
 pub mod consensus {

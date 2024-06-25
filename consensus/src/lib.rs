@@ -6,5 +6,5 @@ pub mod types;
 mod consensus;
 pub use crate::consensus::*;
 
-mod constants;
-mod utils;
+pub mod constants;
+pub mod utils;
