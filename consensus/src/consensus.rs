@@ -413,6 +413,51 @@ impl<R: ConsensusRpc> Inner<R> {
         Ok(())
     }
 
+    pub async fn bootstrap_from(
+        &mut self,
+        checkpoint: &[u8],
+        bootstrap: &mut Bootstrap,
+    ) -> Result<()> {
+        let is_valid = self.is_valid_checkpoint(bootstrap.header.slot.into());
+
+        if !is_valid {
+            if self.config.strict_checkpoint_age {
+                return Err(ConsensusError::CheckpointTooOld.into());
+            } else {
+                warn!(target: "helios::consensus", "checkpoint too old, consider using a more recent block");
+            }
+        }
+
+        let committee_valid = is_current_committee_proof_valid(
+            &bootstrap.header,
+            &mut bootstrap.current_sync_committee,
+            &bootstrap.current_sync_committee_branch,
+        );
+
+        let header_hash = bootstrap.header.hash_tree_root()?.to_string();
+        let expected_hash = format!("0x{}", hex::encode(checkpoint));
+        let header_valid = header_hash == expected_hash;
+
+        if !header_valid {
+            return Err(ConsensusError::InvalidHeaderHash(expected_hash, header_hash).into());
+        }
+
+        if !committee_valid {
+            return Err(ConsensusError::InvalidCurrentSyncCommitteeProof.into());
+        }
+
+        self.store = LightClientStore {
+            finalized_header: bootstrap.header.clone(),
+            current_sync_committee: bootstrap.current_sync_committee.clone(),
+            next_sync_committee: None,
+            optimistic_header: bootstrap.header.clone(),
+            previous_max_active_participants: 0,
+            current_max_active_participants: 0,
+        };
+
+        Ok(())
+    }
+
     // implements checks from validate_light_client_update and process_light_client_update in the
     // specification
     fn verify_generic_update(&self, update: &GenericUpdate) -> Result<()> {
