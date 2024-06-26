@@ -211,7 +211,7 @@ pub struct Eth1Data {
     block_hash: Bytes32,
 }
 
-#[derive(serde::Deserialize, Debug)]
+#[derive(serde::Deserialize, serde::Serialize, Debug)]
 pub struct Bootstrap {
     #[serde(deserialize_with = "header_deserialize")]
     pub header: Header,
@@ -251,7 +251,7 @@ pub struct OptimisticUpdate {
     pub signature_slot: U64,
 }
 
-#[derive(serde::Deserialize, Debug, Clone, Default, SimpleSerialize)]
+#[derive(serde::Deserialize, serde::Serialize, Debug, Clone, Default, SimpleSerialize)]
 pub struct Header {
     pub slot: U64,
     pub proposer_index: U64,
@@ -260,7 +260,7 @@ pub struct Header {
     pub body_root: Bytes32,
 }
 
-#[derive(Debug, Clone, Default, SimpleSerialize, serde::Deserialize)]
+#[derive(Debug, Clone, Default, SimpleSerialize, serde::Deserialize, serde::Serialize)]
 pub struct SyncCommittee {
     pub pubkeys: Vector<BLSPubKey, 512>,
     pub aggregate_pubkey: BLSPubKey,

@@ -89,6 +89,16 @@ impl<'de, const N: usize> serde::Deserialize<'de> for ByteVector<N> {
     }
 }
 
+impl<const N: usize> serde::Serialize for ByteVector<N> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let hex_string = format!("0x{}", hex::encode(self.as_slice()));
+        serializer.serialize_str(&hex_string)
+    }
+}
+
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ByteList<const N: usize> {
     inner: List<u8, N>,
@@ -190,6 +200,16 @@ impl U64 {
 impl From<U64> for u64 {
     fn from(value: U64) -> Self {
         value.inner
+    }
+}
+
+impl serde::Serialize for U64 {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let output = format!("{}", self.inner);
+        serializer.collect_str(&output)
     }
 }
 
