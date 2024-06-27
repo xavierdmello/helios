@@ -347,7 +347,6 @@ dependencies = [
  "futures",
  "getrandom",
  "hex",
- "openssl",
  "parking_lot",
  "reqwest",
  "retri",
