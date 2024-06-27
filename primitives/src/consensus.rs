@@ -1,9 +1,14 @@
 use crate::errors::ConsensusError;
-use crate::types::{Bytes32, GenericUpdate, Header, SyncAggregate, SyncCommittee};
-use crate::utils::{calc_sync_period, is_proof_valid};
+use crate::types::{
+    Bytes32, GenericUpdate, Header, LightClientStore, SignatureBytes, SyncAggregate, SyncCommittee,
+};
+use crate::utils::{
+    calc_sync_period, compute_domain, compute_signing_root, is_aggregate_valid, is_proof_valid,
+};
 use eyre::Result;
 use milagro_bls::*;
 use ssz_rs::prelude::*;
+use zduny_wasm_timer::{SystemTime, UNIX_EPOCH};
 
 // pub fn bootstrap_from(checkpoint: &[u8], bootstrap: &mut Bootstrap) -> Result<()> {
 //     let is_valid = self.is_valid_checkpoint(bootstrap.header.slot.into());
@@ -110,14 +115,19 @@ pub fn is_current_committee_proof_valid(
 
 // implements checks from validate_light_client_update and process_light_client_update in the
 // specification
-pub fn verify_generic_update(update: &GenericUpdate) -> Result<()> {
+pub fn verify_generic_update(
+    update: &GenericUpdate,
+    now: SystemTime,
+    genesis_time: u64,
+    store: LightClientStore,
+) -> Result<()> {
     let bits = get_bits(&update.sync_aggregate.sync_committee_bits);
     if bits == 0 {
         return Err(ConsensusError::InsufficientParticipation.into());
     }
 
     let update_finalized_slot = update.finalized_header.clone().unwrap_or_default().slot;
-    let valid_time = self.expected_current_slot() >= update.signature_slot
+    let valid_time = expected_current_slot(now, genesis_time) >= update.signature_slot
         && update.signature_slot > update.attested_header.slot.as_u64()
         && update.attested_header.slot >= update_finalized_slot;
 
@@ -125,9 +135,9 @@ pub fn verify_generic_update(update: &GenericUpdate) -> Result<()> {
         return Err(ConsensusError::InvalidTimestamp.into());
     }
 
-    let store_period = calc_sync_period(self.store.finalized_header.slot.into());
+    let store_period = calc_sync_period(store.finalized_header.slot.into());
     let update_sig_period = calc_sync_period(update.signature_slot);
-    let valid_period = if self.store.next_sync_committee.is_some() {
+    let valid_period = if store.next_sync_committee.is_some() {
         update_sig_period == store_period || update_sig_period == store_period + 1
     } else {
         update_sig_period == store_period
@@ -138,12 +148,11 @@ pub fn verify_generic_update(update: &GenericUpdate) -> Result<()> {
     }
 
     let update_attested_period = calc_sync_period(update.attested_header.slot.into());
-    let update_has_next_committee = self.store.next_sync_committee.is_none()
+    let update_has_next_committee = store.next_sync_committee.is_none()
         && update.next_sync_committee.is_some()
         && update_attested_period == store_period;
 
-    if update.attested_header.slot <= self.store.finalized_header.slot && !update_has_next_committee
-    {
+    if update.attested_header.slot <= store.finalized_header.slot && !update_has_next_committee {
         return Err(ConsensusError::NotRelevant.into());
     }
 
@@ -172,14 +181,14 @@ pub fn verify_generic_update(update: &GenericUpdate) -> Result<()> {
     }
 
     let sync_committee = if update_sig_period == store_period {
-        &self.store.current_sync_committee
+        &store.current_sync_committee
     } else {
-        self.store.next_sync_committee.as_ref().unwrap()
+        store.next_sync_committee.as_ref().unwrap()
     };
 
     let pks = get_participating_keys(sync_committee, &update.sync_aggregate.sync_committee_bits)?;
 
-    let is_valid_sig = self.verify_sync_committee_signture(
+    let is_valid_sig = verify_sync_committee_signture(
         &pks,
         &update.attested_header,
         &update.sync_aggregate.sync_committee_signature,
@@ -191,4 +200,47 @@ pub fn verify_generic_update(update: &GenericUpdate) -> Result<()> {
     }
 
     Ok(())
+}
+
+pub fn expected_current_slot(now: SystemTime, genesis_time: u64) -> u64 {
+    let now = now.duration_since(UNIX_EPOCH).unwrap();
+    let since_genesis = now - std::time::Duration::from_secs(genesis_time);
+
+    since_genesis.as_secs() / 12
+}
+
+fn verify_sync_committee_signture(
+    pks: &[PublicKey],
+    attested_header: &Header,
+    signature: &SignatureBytes,
+    signature_slot: u64,
+) -> bool {
+    let res: Result<bool> = (move || {
+        let pks: Vec<&PublicKey> = pks.iter().collect();
+        let header_root = Bytes32::try_from(attested_header.clone().hash_tree_root()?.as_ref())?;
+        let signing_root = compute_committee_sign_root(header_root, signature_slot)?;
+
+        Ok(is_aggregate_valid(signature, signing_root.as_ref(), &pks))
+    })();
+
+    if let Ok(is_valid) = res {
+        is_valid
+    } else {
+        false
+    }
+}
+
+// TODO: Pass in config instead of individual parameters
+fn compute_committee_sign_root(
+    header: Bytes32,
+    slot: u64,
+    genesis_root: Vec<u8>,
+    fork_version: Vec<u8>,
+) -> Result<Node> {
+    let genesis_root = genesis_root.to_vec().try_into().unwrap();
+
+    let domain_type = &hex::decode("07000000")?[..];
+    let fork_version = Vector::try_from(fork_version).map_err(|(_, err)| err)?;
+    let domain = compute_domain(domain_type, fork_version, genesis_root)?;
+    compute_signing_root(header, domain)
 }

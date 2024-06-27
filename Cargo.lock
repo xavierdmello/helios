@@ -2144,6 +2144,7 @@ dependencies = [
  "ssz_rs",
  "superstruct 0.8.0",
  "thiserror",
+ "zduny-wasm-timer",
 ]
 
 [[package]]

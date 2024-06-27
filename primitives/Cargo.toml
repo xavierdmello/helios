@@ -15,3 +15,4 @@ thiserror = "1.0.61"
 milagro_bls.workspace = true
 ethers-core.workspace = true
 common = { path = "../common" }
+zduny-wasm-timer = "0.2.8"
