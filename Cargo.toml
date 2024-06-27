@@ -9,6 +9,7 @@ members = [
     "config",
     "consensus",
     "execution",
+    "primitives"
 ]
 
 

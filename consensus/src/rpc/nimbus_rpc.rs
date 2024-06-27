@@ -131,5 +131,5 @@ struct SpecResponse {
 #[derive(serde::Deserialize, Debug)]
 struct Spec {
     #[serde(rename = "DEPOSIT_NETWORK_ID")]
-    chain_id: primitives::U64,
+    chain_id: type_primitives::U64,
 }

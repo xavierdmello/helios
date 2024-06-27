@@ -3,10 +3,11 @@ use ssz_rs::prelude::*;
 
 use superstruct::superstruct;
 
-use self::primitives::{ByteList, ByteVector, U64};
+pub use self::type_primitives::{ByteList, ByteVector, U64};
 use self::utils::{header_deserialize, superstruct_ssz, u256_deserialize};
+pub use crate::errors::ConsensusError;
 
-pub mod primitives;
+pub mod type_primitives;
 mod utils;
 
 pub type Address = ByteVector<20>;
@@ -15,7 +16,6 @@ pub type LogsBloom = ByteVector<256>;
 pub type BLSPubKey = ByteVector<48>;
 pub type SignatureBytes = ByteVector<96>;
 pub type Transaction = ByteList<1073741824>;
-
 
 #[derive(serde::Deserialize, Debug, Default, SimpleSerialize, Clone)]
 pub struct BeaconBlock {
@@ -322,4 +322,14 @@ impl From<&OptimisticUpdate> for GenericUpdate {
             finality_branch: None,
         }
     }
+}
+
+#[derive(Debug, Default)]
+pub struct LightClientStore {
+    pub finalized_header: Header,
+    pub current_sync_committee: SyncCommittee,
+    pub next_sync_committee: Option<SyncCommittee>,
+    pub optimistic_header: Header,
+    pub previous_max_active_participants: u64,
+    pub current_max_active_participants: u64,
 }
