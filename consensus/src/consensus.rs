@@ -30,6 +30,8 @@ use super::rpc::ConsensusRpc;
 use super::types::*;
 use super::utils::*;
 
+use primitives::consensus::{get_bits, get_participating_keys, is_finality_proof_valid, is_next_committee_proof_valid, is_current_committee_proof_valid};
+
 pub struct ConsensusClient<R: ConsensusRpc, DB: Database> {
     pub block_recv: Option<Receiver<Block>>,
     pub finalized_block_recv: Option<watch::Receiver<Option<Block>>>,
@@ -624,69 +626,6 @@ impl<R: ConsensusRpc> Inner<R> {
 
         slot_age < self.config.max_checkpoint_age
     }
-}
-
-fn get_participating_keys(
-    committee: &SyncCommittee,
-    bitfield: &Bitvector<512>,
-) -> Result<Vec<PublicKey>> {
-    let mut pks: Vec<PublicKey> = Vec::new();
-    bitfield.iter().enumerate().for_each(|(i, bit)| {
-        if bit == true {
-            let pk = &committee.pubkeys[i];
-            let pk = PublicKey::from_bytes_unchecked(pk).unwrap();
-            pks.push(pk);
-        }
-    });
-
-    Ok(pks)
-}
-
-fn get_bits(bitfield: &Bitvector<512>) -> u64 {
-    let mut count = 0;
-    bitfield.iter().for_each(|bit| {
-        if bit == true {
-            count += 1;
-        }
-    });
-
-    count
-}
-
-fn is_finality_proof_valid(
-    attested_header: &Header,
-    finality_header: &mut Header,
-    finality_branch: &[Bytes32],
-) -> bool {
-    is_proof_valid(attested_header, finality_header, finality_branch, 6, 41)
-}
-
-fn is_next_committee_proof_valid(
-    attested_header: &Header,
-    next_committee: &mut SyncCommittee,
-    next_committee_branch: &[Bytes32],
-) -> bool {
-    is_proof_valid(
-        attested_header,
-        next_committee,
-        next_committee_branch,
-        5,
-        23,
-    )
-}
-
-fn is_current_committee_proof_valid(
-    attested_header: &Header,
-    current_committee: &mut SyncCommittee,
-    current_committee_branch: &[Bytes32],
-) -> bool {
-    is_proof_valid(
-        attested_header,
-        current_committee,
-        current_committee_branch,
-        5,
-        22,
-    )
 }
 
 #[cfg(test)]

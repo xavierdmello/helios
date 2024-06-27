@@ -56,6 +56,7 @@ config = { path = "./config" }
 common = { path = "./common" }
 consensus = { path = "./consensus" }
 execution = { path = "./execution" }
+primitives = { path = "./primitives" }
 
 
 [dev-dependencies]

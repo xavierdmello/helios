@@ -5,4 +5,3 @@ mod consensus;
 pub use crate::consensus::*;
 
 pub mod constants;
-pub mod utils;

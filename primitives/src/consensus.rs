@@ -1,9 +1,11 @@
 use crate::types::{
-    GenericUpdate, Header, SyncCommittee, SyncAggregate, Bytes32, U64,
-    LightClientStore, ConsensusError,
+    Bytes32, ConsensusError, GenericUpdate, Header, LightClientStore, SyncAggregate, SyncCommittee,
+    U64,
 };
-use ssz_rs::prelude::*;
+use crate::utils::{calc_sync_period, is_proof_valid};
 use eyre::Result;
+use ssz_rs::prelude::*;
+use milagro_bls::*;
 // pub fn bootstrap_from(checkpoint: &[u8], bootstrap: &mut Bootstrap) -> Result<()> {
 //     let is_valid = self.is_valid_checkpoint(bootstrap.header.slot.into());
 
@@ -44,6 +46,68 @@ use eyre::Result;
 
 //     Ok(())
 // }
+pub fn get_participating_keys(
+    committee: &SyncCommittee,
+    bitfield: &Bitvector<512>,
+) -> Result<Vec<PublicKey>> {
+    let mut pks: Vec<PublicKey> = Vec::new();
+    bitfield.iter().enumerate().for_each(|(i, bit)| {
+        if bit == true {
+            let pk = &committee.pubkeys[i];
+            let pk = PublicKey::from_bytes_unchecked(pk).unwrap();
+            pks.push(pk);
+        }
+    });
+
+    Ok(pks)
+}
+
+pub fn get_bits(bitfield: &Bitvector<512>) -> u64 {
+    let mut count = 0;
+    bitfield.iter().for_each(|bit| {
+        if bit == true {
+            count += 1;
+        }
+    });
+
+    count
+}
+
+pub fn is_finality_proof_valid(
+    attested_header: &Header,
+    finality_header: &mut Header,
+    finality_branch: &[Bytes32],
+) -> bool {
+    is_proof_valid(attested_header, finality_header, finality_branch, 6, 41)
+}
+
+pub fn is_next_committee_proof_valid(
+    attested_header: &Header,
+    next_committee: &mut SyncCommittee,
+    next_committee_branch: &[Bytes32],
+) -> bool {
+    is_proof_valid(
+        attested_header,
+        next_committee,
+        next_committee_branch,
+        5,
+        23,
+    )
+}
+
+pub fn is_current_committee_proof_valid(
+    attested_header: &Header,
+    current_committee: &mut SyncCommittee,
+    current_committee_branch: &[Bytes32],
+) -> bool {
+    is_proof_valid(
+        attested_header,
+        current_committee,
+        current_committee_branch,
+        5,
+        22,
+    )
+}
 
 // implements checks from validate_light_client_update and process_light_client_update in the
 // specification

@@ -1,3 +1,4 @@
 pub mod errors;
-pub mod primitives;
+pub mod consensus;
 pub mod types;
+pub mod utils;
