@@ -2,21 +2,17 @@
 name = "helios"
 version = "0.5.5"
 edition = "2021"
-autobenches = false
-exclude = ["benches"]
 
 [workspace]
 members = [
-    "cli",
+
     "client",
     "common",
     "config",
     "consensus",
-    "execution",
-    "helios-ts",
 ]
 
-default-members = ["cli"]
+
 
 ######################################
 # Workspace Dependencies
@@ -26,15 +22,7 @@ default-members = ["cli"]
 # consensus
 ssz-rs = { package = "ssz_rs", version = "0.9.0" }
 milagro_bls = { package = "snowbridge-milagro-bls", git = "https://github.com/Snowfork/milagro_bls", rev = "6a95c9e33c6a41d9137761e593d53742ebb964de" }
-
-# execution
-ethers = { git = "https://github.com/gakonst/ethers-rs", rev = "3bf1a9e0d698e9fdfc91d0353878901af5a5c5ef" }
-revm = { git = "https://github.com/bluealloy/revm", rev = "23cbac479f616eba5ab11ddfe6d5814b9c492202", default-features = false, features = [
-    "std",
-    "serde",
-] }
-triehash-ethereum = { git = "https://github.com/openethereum/parity-ethereum", rev = "55c90d4016505317034e3e98f699af07f5404b63" }
-
+ethers-core = "2.0.14"
 # async/futures
 async-trait = "0.1.57"
 futures = "0.3.23"
@@ -68,7 +56,7 @@ client = { path = "./client" }
 config = { path = "./config" }
 common = { path = "./common" }
 consensus = { path = "./consensus" }
-execution = { path = "./execution" }
+
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
@@ -79,7 +67,7 @@ serde = { version = "1.0.154", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 eyre = "0.6.8"
 dirs = "5.0.1"
-ethers = { git = "https://github.com/gakonst/ethers-rs", rev = "3bf1a9e0d698e9fdfc91d0353878901af5a5c5ef" }
+
 tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
 tracing = "0.1.37"
 tracing-test = "0.2.4"
@@ -98,8 +86,7 @@ lto = true
 codegen-units = 1
 panic = "abort"
 
-[profile.bench]
-debug = true
+
 
 ######################################
 # Examples
@@ -124,23 +111,3 @@ path = "examples/config.rs"
 [[example]]
 name = "call"
 path = "examples/call.rs"
-
-######################################
-# Benchmarks
-######################################
-
-[[bench]]
-name = "file_db"
-harness = false
-
-[[bench]]
-name = "get_balance"
-harness = false
-
-[[bench]]
-name = "get_code"
-harness = false
-
-[[bench]]
-name = "sync"
-harness = false

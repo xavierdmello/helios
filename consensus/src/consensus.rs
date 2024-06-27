@@ -413,11 +413,7 @@ impl<R: ConsensusRpc> Inner<R> {
         Ok(())
     }
 
-    pub async fn bootstrap_from(
-        &mut self,
-        checkpoint: &[u8],
-        bootstrap: &mut Bootstrap,
-    ) -> Result<()> {
+    pub fn bootstrap_from(&mut self, checkpoint: &[u8], bootstrap: &mut Bootstrap) -> Result<()> {
         let is_valid = self.is_valid_checkpoint(bootstrap.header.slot.into());
 
         if !is_valid {

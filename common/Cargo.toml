@@ -8,5 +8,5 @@ eyre.workspace = true
 serde.workspace = true
 hex.workspace = true
 ssz-rs.workspace = true
-ethers.workspace = true
+ethers-core.workspace = true
 thiserror.workspace = true

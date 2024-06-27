@@ -9,7 +9,7 @@ ssz-rs.workspace = true
 milagro_bls.workspace = true
 
 # execution
-ethers.workspace = true
+ethers-core.workspace = true
 
 # async/futures
 tokio.workspace = true
