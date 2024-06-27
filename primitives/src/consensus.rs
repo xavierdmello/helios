@@ -120,6 +120,8 @@ pub fn verify_generic_update(
     now: SystemTime,
     genesis_time: u64,
     store: LightClientStore,
+    genesis_root: Vec<u8>,
+    fork_version: Vec<u8>,
 ) -> Result<()> {
     let bits = get_bits(&update.sync_aggregate.sync_committee_bits);
     if bits == 0 {
@@ -193,6 +195,8 @@ pub fn verify_generic_update(
         &update.attested_header,
         &update.sync_aggregate.sync_committee_signature,
         update.signature_slot,
+        genesis_root,
+        fork_version,
     );
 
     if !is_valid_sig {
@@ -214,11 +218,14 @@ fn verify_sync_committee_signture(
     attested_header: &Header,
     signature: &SignatureBytes,
     signature_slot: u64,
+    genesis_root: Vec<u8>,
+    fork_version: Vec<u8>,
 ) -> bool {
     let res: Result<bool> = (move || {
         let pks: Vec<&PublicKey> = pks.iter().collect();
         let header_root = Bytes32::try_from(attested_header.clone().hash_tree_root()?.as_ref())?;
-        let signing_root = compute_committee_sign_root(header_root, signature_slot)?;
+        let signing_root =
+            compute_committee_sign_root(header_root, signature_slot, genesis_root, fork_version)?;
 
         Ok(is_aggregate_valid(signature, signing_root.as_ref(), &pks))
     })();
