@@ -29,7 +29,7 @@ tracing.workspace = true
 thiserror.workspace = true
 hyper.workspace = true
 
-common = { path = "../common" }
+primitives = { path = "../primitives" }
 consensus = { path = "../consensus" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

@@ -1,11 +1,10 @@
-use crate::types::{
-    Bytes32, ConsensusError, GenericUpdate, Header, LightClientStore, SyncAggregate, SyncCommittee,
-    U64,
-};
+use crate::errors::ConsensusError;
+use crate::types::{Bytes32, GenericUpdate, Header, SyncAggregate, SyncCommittee};
 use crate::utils::{calc_sync_period, is_proof_valid};
 use eyre::Result;
-use ssz_rs::prelude::*;
 use milagro_bls::*;
+use ssz_rs::prelude::*;
+
 // pub fn bootstrap_from(checkpoint: &[u8], bootstrap: &mut Bootstrap) -> Result<()> {
 //     let is_valid = self.is_valid_checkpoint(bootstrap.header.slot.into());
 

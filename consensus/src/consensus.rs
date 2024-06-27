@@ -17,7 +17,7 @@ use tokio::sync::mpsc::channel;
 use tokio::sync::mpsc::Receiver;
 use tokio::sync::watch;
 
-use common::types::Block;
+use primitives::types::Block;
 use config::CheckpointFallback;
 use config::Config;
 use config::Network;

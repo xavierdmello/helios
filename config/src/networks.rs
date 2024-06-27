@@ -3,7 +3,7 @@ use std::fmt::Display;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use common::utils::hex_str_to_bytes;
+use primitives::utils::hex_str_to_bytes;
 #[cfg(not(target_arch = "wasm32"))]
 use dirs::home_dir;
 use eyre::Result;

@@ -317,13 +317,13 @@ dependencies = [
 name = "config"
 version = "0.5.5"
 dependencies = [
- "common",
  "dirs",
  "ethers-core",
  "eyre",
  "figment",
  "futures",
  "hex",
+ "primitives",
  "reqwest",
  "retri",
  "serde",
@@ -341,7 +341,6 @@ dependencies = [
  "async-trait",
  "bytes",
  "chrono",
- "common",
  "config",
  "ethers-core",
  "eyre",
@@ -886,7 +885,6 @@ version = "0.5.5"
 dependencies = [
  "async-trait",
  "bytes",
- "common",
  "consensus",
  "ethers-core",
  "eyre",
@@ -894,6 +892,7 @@ dependencies = [
  "hex",
  "hyper",
  "openssl",
+ "primitives",
  "reqwest",
  "serde",
  "serde_json",
@@ -2134,6 +2133,7 @@ dependencies = [
 name = "primitives"
 version = "0.1.0"
 dependencies = [
+ "common",
  "ethers-core",
  "eyre",
  "hex",

@@ -5,11 +5,11 @@ edition = "2021"
 
 [workspace]
 members = [
-    "common",
     "config",
     "consensus",
     "execution",
-    "primitives"
+    "primitives",
+    "common"
 ]
 
 
@@ -53,11 +53,10 @@ retri = "0.1.0"
 
 [dependencies]
 config = { path = "./config" }
-common = { path = "./common" }
 consensus = { path = "./consensus" }
 execution = { path = "./execution" }
 primitives = { path = "./primitives" }
-
+common = { path = "./common" }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

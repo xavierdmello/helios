@@ -3,11 +3,9 @@ use ssz_rs::prelude::*;
 
 use superstruct::superstruct;
 
-pub use self::type_primitives::{ByteList, ByteVector, U64};
 use self::utils::{header_deserialize, superstruct_ssz, u256_deserialize};
-pub use crate::errors::ConsensusError;
-
-pub mod type_primitives;
+use self::type_primitives::{ByteList, ByteVector, U64};
+mod type_primitives;
 mod utils;
 
 pub type Address = ByteVector<20>;
@@ -211,7 +209,7 @@ pub struct Eth1Data {
     block_hash: Bytes32,
 }
 
-#[derive(serde::Deserialize, serde::Serialize, Debug)]
+#[derive(serde::Deserialize, Debug)]
 pub struct Bootstrap {
     #[serde(deserialize_with = "header_deserialize")]
     pub header: Header,
@@ -251,7 +249,7 @@ pub struct OptimisticUpdate {
     pub signature_slot: U64,
 }
 
-#[derive(serde::Deserialize, serde::Serialize, Debug, Clone, Default, SimpleSerialize)]
+#[derive(serde::Deserialize, Debug, Clone, Default, SimpleSerialize)]
 pub struct Header {
     pub slot: U64,
     pub proposer_index: U64,
@@ -260,7 +258,7 @@ pub struct Header {
     pub body_root: Bytes32,
 }
 
-#[derive(Debug, Clone, Default, SimpleSerialize, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, Default, SimpleSerialize, serde::Deserialize)]
 pub struct SyncCommittee {
     pub pubkeys: Vector<BLSPubKey, 512>,
     pub aggregate_pubkey: BLSPubKey,
@@ -322,14 +320,4 @@ impl From<&OptimisticUpdate> for GenericUpdate {
             finality_branch: None,
         }
     }
-}
-
-#[derive(Debug, Default)]
-pub struct LightClientStore {
-    pub finalized_header: Header,
-    pub current_sync_committee: SyncCommittee,
-    pub next_sync_committee: Option<SyncCommittee>,
-    pub optimistic_header: Header,
-    pub previous_max_active_participants: u64,
-    pub current_max_active_participants: u64,
 }

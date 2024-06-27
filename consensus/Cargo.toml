@@ -32,7 +32,6 @@ superstruct.workspace = true
 zduny-wasm-timer.workspace = true
 retri.workspace = true
 
-common = { path = "../common" }
 config = { path = "../config" }
 primitives = { path = "../primitives" }
 
