@@ -50,11 +50,7 @@
 //!
 //! Errors used across helios.
 
-pub mod client {
-    pub use client::{Client, ClientBuilder};
-    pub use consensus::database::*;
-    pub use consensus::*;
-}
+
 
 pub mod consensus {
     pub use consensus::*;
@@ -76,7 +72,6 @@ pub mod errors {
 }
 
 pub mod prelude {
-    pub use crate::client::*;
     pub use crate::config::*;
     pub use crate::errors::*;
     pub use crate::types::*;

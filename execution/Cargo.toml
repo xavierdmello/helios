@@ -1,31 +1,39 @@
 [package]
-name = "client"
+name = "execution"
 version = "0.5.5"
 edition = "2021"
 
 [dependencies]
-eyre.workspace = true
-serde.workspace = true
-hex.workspace = true
+# consensus
 ssz-rs.workspace = true
+
+# execution
 ethers-core.workspace = true
+
+
+# async/futures
 futures.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+
+# io
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+# misc
+eyre.workspace = true
+hex.workspace = true
+bytes.workspace = true
 tracing.workspace = true
 thiserror.workspace = true
-tokio.workspace = true
-zduny-wasm-timer.workspace = true
+hyper.workspace = true
 
 common = { path = "../common" }
 consensus = { path = "../consensus" }
 
-config = { path = "../config" }
-
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-jsonrpsee = { version = "0.17.1", features = ["full"] }
+openssl.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-gloo-timers = "0.3.0"
 wasm-bindgen-futures = "0.4.33"
-
-[target.wasm32-unknown-unknown.dependencies]
-parking_lot = { version = "0.12.2" }

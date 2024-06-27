@@ -5,11 +5,10 @@ edition = "2021"
 
 [workspace]
 members = [
-
-    "client",
     "common",
     "config",
     "consensus",
+    "execution",
 ]
 
 
@@ -52,10 +51,10 @@ retri = "0.1.0"
 ######################################
 
 [dependencies]
-client = { path = "./client" }
 config = { path = "./config" }
 common = { path = "./common" }
 consensus = { path = "./consensus" }
+execution = { path = "./execution" }
 
 
 [dev-dependencies]
