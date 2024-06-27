@@ -2134,6 +2134,7 @@ dependencies = [
 name = "primitives"
 version = "0.1.0"
 dependencies = [
+ "ethers-core",
  "eyre",
  "hex",
  "serde",
