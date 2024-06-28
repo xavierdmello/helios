@@ -418,24 +418,40 @@ impl<R: ConsensusRpc> Inner<R> {
 
     pub fn verify_update(&self, update: &Update) -> Result<()> {
         let update = GenericUpdate::from(update);
+        let now = SystemTime::now();
+
         verify_generic_update(
             &update,
-            self.now,
-            self.genesis_time,
+            now,
+            self.config.chain.genesis_time,
             self.store,
             self.config.chain.genesis_root,
-            self.config.forks.for
+            &self.config.forks,
         )
     }
 
     fn verify_finality_update(&self, update: &FinalityUpdate) -> Result<()> {
         let update = GenericUpdate::from(update);
-        verify_generic_update(&update)
+        verify_generic_update(
+            &update,
+            now,
+            self.config.chain.genesis_time,
+            self.store,
+            self.config.chain.genesis_root,
+            &self.config.forks,
+        )
     }
 
     fn verify_optimistic_update(&self, update: &OptimisticUpdate) -> Result<()> {
         let update = GenericUpdate::from(update);
-        verify_generic_update(&update)
+        verify_generic_update(
+            &update,
+            now,
+            self.config.chain.genesis_time,
+            self.store,
+            self.config.chain.genesis_root,
+            &self.config.forks,
+        )
     }
 
     // implements state changes from apply_light_client_update and process_light_client_update in

@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use strum::EnumIter;
 
 use crate::base::BaseConfig;
-use crate::types::{ChainConfig, Fork, Forks};
+use primitives::forktypes::{ChainConfig, Fork, Forks};
 
 #[derive(
     Debug, Clone, Copy, Serialize, Deserialize, EnumIter, Hash, Eq, PartialEq, PartialOrd, Ord,

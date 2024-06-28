@@ -1,7 +1,7 @@
 use crate::base::BaseConfig;
 use crate::cli::CliConfig;
-use crate::types::{ChainConfig, Forks};
-use crate::utils::{bytes_deserialize, bytes_opt_deserialize};
+use primitives::forktypes::{ChainConfig, Forks};
+use primitives::utils::{bytes_deserialize, bytes_opt_deserialize};
 use crate::Network;
 use figment::{
     providers::{Format, Serialized, Toml},
@@ -68,7 +68,7 @@ impl Config {
                 }
                 exit(1);
             }
-            
+
         }
     }
 
