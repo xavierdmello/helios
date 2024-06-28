@@ -7,6 +7,7 @@ pub use self::type_primitives::{BlockTag, ByteList, ByteVector, U64};
 use self::utils::{header_deserialize, superstruct_ssz, u256_deserialize};
 mod type_primitives;
 mod utils;
+use serde;
 
 pub type Address = ByteVector<20>;
 pub type Bytes32 = ByteVector<32>;
@@ -226,7 +227,7 @@ pub struct Bootstrap {
     pub current_sync_committee_branch: Vec<Bytes32>,
 }
 
-#[derive(serde::Deserialize, Debug, Clone)]
+#[derive(serde::Deserialize, serde::Serialize, Debug, Clone)]
 pub struct Update {
     #[serde(deserialize_with = "header_deserialize")]
     pub attested_header: Header,
@@ -258,7 +259,7 @@ pub struct OptimisticUpdate {
     pub signature_slot: U64,
 }
 
-#[derive(serde::Deserialize, Debug, Clone, Default, SimpleSerialize)]
+#[derive(serde::Deserialize, Debug, Clone, Default, SimpleSerialize, serde::Serialize)]
 pub struct Header {
     pub slot: U64,
     pub proposer_index: U64,
@@ -267,13 +268,13 @@ pub struct Header {
     pub body_root: Bytes32,
 }
 
-#[derive(Debug, Clone, Default, SimpleSerialize, serde::Deserialize)]
+#[derive(Debug, Clone, Default, SimpleSerialize, serde::Deserialize, serde::Serialize)]
 pub struct SyncCommittee {
     pub pubkeys: Vector<BLSPubKey, 512>,
     pub aggregate_pubkey: BLSPubKey,
 }
 
-#[derive(serde::Deserialize, Debug, Clone, Default, SimpleSerialize)]
+#[derive(serde::Deserialize, Debug, Clone, Default, SimpleSerialize, serde::Serialize)]
 pub struct SyncAggregate {
     pub sync_committee_bits: Bitvector<512>,
     pub sync_committee_signature: SignatureBytes,
