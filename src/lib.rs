@@ -59,12 +59,11 @@ pub mod config {
 }
 
 pub mod types {
+    pub use common::types::{Block, BlockTag, Transactions};
     pub use execution::types::{Account, CallOpts};
-    pub use primitives::types::{Block, BlockTag, Transactions};
 }
 
 pub mod errors {
-    pub use consensus::errors::*;
     pub use execution::errors::*;
     pub use primitives::errors::*;
 }
