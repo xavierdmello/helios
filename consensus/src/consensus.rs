@@ -414,8 +414,6 @@ impl<R: ConsensusRpc> Inner<R> {
         Ok(())
     }
 
-    //pub fn verify_generic_update(update: &GenericUpdate, now: SystemTime, genesis_time: u64, store: LightClientStore, genesis_root: Vec<u8>, fork_version: Vec<u8>) -> Result<()>
-
     pub fn verify_update(&self, update: &Update) -> Result<()> {
         let update = GenericUpdate::from(update);
         let now = SystemTime::now();

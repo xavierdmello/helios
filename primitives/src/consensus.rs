@@ -2,6 +2,7 @@ use crate::errors::ConsensusError;
 use crate::forktypes::Forks;
 use crate::types::{
     Bytes32, GenericUpdate, Header, LightClientStore, SignatureBytes, SyncAggregate, SyncCommittee,
+    Update,
 };
 use crate::utils::{
     calc_sync_period, compute_domain, compute_signing_root, is_aggregate_valid, is_proof_valid,
@@ -124,6 +125,7 @@ pub fn verify_generic_update(
     genesis_root: Vec<u8>,
     forks: &Forks,
 ) -> Result<()> {
+    println!("verifying update");
     let bits = get_bits(&update.sync_aggregate.sync_committee_bits);
     if bits == 0 {
         return Err(ConsensusError::InsufficientParticipation.into());
@@ -204,7 +206,22 @@ pub fn verify_generic_update(
         return Err(ConsensusError::InvalidSignature.into());
     }
 
+    println!("update is valid!");
+
     Ok(())
+}
+
+pub fn verify_update(
+    update: &Update,
+    now: SystemTime,
+    genesis_time: u64,
+    store: LightClientStore,
+    genesis_root: Vec<u8>,
+    forks: &Forks,
+) -> Result<()> {
+    let update = GenericUpdate::from(update);
+
+    verify_generic_update(&update, now, genesis_time, store, genesis_root, forks)
 }
 
 pub fn expected_current_slot(now: SystemTime, genesis_time: u64) -> u64 {
