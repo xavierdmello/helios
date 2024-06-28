@@ -37,7 +37,7 @@ use primitives::types::{
     SignatureBytes, Update,
 };
 use primitives::utils::{
-    calc_sync_period, compute_domain, compute_signing_root, d, is_aggregate_valid, is_proof_vali,
+    calc_sync_period, compute_domain, compute_signing_root,  is_aggregate_valid, is_proof_valid,
 };
 
 pub struct ConsensusClient<R: ConsensusRpc, DB: Database> {
@@ -424,32 +424,36 @@ impl<R: ConsensusRpc> Inner<R> {
             &update,
             now,
             self.config.chain.genesis_time,
-            self.store,
-            self.config.chain.genesis_root,
+            self.store.clone(),
+            self.config.chain.genesis_root.clone(),
             &self.config.forks,
         )
     }
 
     fn verify_finality_update(&self, update: &FinalityUpdate) -> Result<()> {
         let update = GenericUpdate::from(update);
+        let now = SystemTime::now();
+
         verify_generic_update(
             &update,
             now,
             self.config.chain.genesis_time,
-            self.store,
-            self.config.chain.genesis_root,
+            self.store.clone(),
+            self.config.chain.genesis_root.clone(),
             &self.config.forks,
         )
     }
 
     fn verify_optimistic_update(&self, update: &OptimisticUpdate) -> Result<()> {
         let update = GenericUpdate::from(update);
+        let now = SystemTime::now();
+
         verify_generic_update(
             &update,
             now,
             self.config.chain.genesis_time,
-            self.store,
-            self.config.chain.genesis_root,
+            self.store.clone(),
+            self.config.chain.genesis_root.clone(),
             &self.config.forks,
         )
     }
@@ -668,12 +672,11 @@ mod tests {
     use crate::{
         consensus::calc_sync_period,
         constants::MAX_REQUEST_LIGHT_CLIENT_UPDATES,
-        errors::ConsensusError,
         rpc::{mock_rpc::MockRpc, ConsensusRpc},
-        types::Header,
-        types::{BLSPubKey, SignatureBytes},
         Inner,
     };
+    use primitives::errors::ConsensusError;
+    use primitives::types::{BLSPubKey, Header, SignatureBytes};
 
     use config::{networks, Config};
     use tokio::sync::{mpsc::channel, watch};

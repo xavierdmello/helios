@@ -15,7 +15,7 @@ pub type BLSPubKey = ByteVector<48>;
 pub type SignatureBytes = ByteVector<96>;
 pub type Transaction = ByteList<1073741824>;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct LightClientStore {
     pub finalized_header: Header,
     pub current_sync_committee: SyncCommittee,
