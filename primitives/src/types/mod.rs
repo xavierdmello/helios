@@ -3,8 +3,8 @@ use ssz_rs::prelude::*;
 
 use superstruct::superstruct;
 
+pub use self::type_primitives::{BlockTag, ByteList, ByteVector, U64};
 use self::utils::{header_deserialize, superstruct_ssz, u256_deserialize};
-use self::type_primitives::{ByteList, ByteVector, U64};
 mod type_primitives;
 mod utils;
 

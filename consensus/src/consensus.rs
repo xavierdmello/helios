@@ -17,20 +17,28 @@ use tokio::sync::mpsc::channel;
 use tokio::sync::mpsc::Receiver;
 use tokio::sync::watch;
 
-use primitives::types::Block;
+use common::types::Block;
 use config::CheckpointFallback;
 use config::Config;
 use config::Network;
 
+use super::rpc::ConsensusRpc;
 use crate::constants::MAX_REQUEST_LIGHT_CLIENT_UPDATES;
 use crate::database::Database;
-use crate::errors::ConsensusError;
+use primitives::errors::ConsensusError;
+use primitives::types::LightClientStore;
 
-use super::rpc::ConsensusRpc;
-use super::types::*;
-use super::utils::*;
-
-use primitives::consensus::{get_bits, get_participating_keys, is_finality_proof_valid, is_next_committee_proof_valid, is_current_committee_proof_valid};
+use primitives::consensus::{
+    get_bits, get_participating_keys, is_current_committee_proof_valid, is_finality_proof_valid,
+    is_next_committee_proof_valid, verify_generic_update,
+};
+use primitives::types::{
+    Bytes32, ExecutionPayload, FinalityUpdate, GenericUpdate, Header, OptimisticUpdate,
+    SignatureBytes, Update,
+};
+use primitives::utils::{
+    calc_sync_period, compute_domain, compute_signing_root, d, is_aggregate_valid, is_proof_vali,
+};
 
 pub struct ConsensusClient<R: ConsensusRpc, DB: Database> {
     pub block_recv: Option<Receiver<Block>>,
@@ -406,19 +414,28 @@ impl<R: ConsensusRpc> Inner<R> {
         Ok(())
     }
 
+    //pub fn verify_generic_update(update: &GenericUpdate, now: SystemTime, genesis_time: u64, store: LightClientStore, genesis_root: Vec<u8>, fork_version: Vec<u8>) -> Result<()>
+
     pub fn verify_update(&self, update: &Update) -> Result<()> {
         let update = GenericUpdate::from(update);
-        self.verify_generic_update(&update)
+        verify_generic_update(
+            &update,
+            self.now,
+            self.genesis_time,
+            self.store,
+            self.config.chain.genesis_root,
+            self.config.forks.for
+        )
     }
 
     fn verify_finality_update(&self, update: &FinalityUpdate) -> Result<()> {
         let update = GenericUpdate::from(update);
-        self.verify_generic_update(&update)
+        verify_generic_update(&update)
     }
 
     fn verify_optimistic_update(&self, update: &OptimisticUpdate) -> Result<()> {
         let update = GenericUpdate::from(update);
-        self.verify_generic_update(&update)
+        verify_generic_update(&update)
     }
 
     // implements state changes from apply_light_client_update and process_light_client_update in

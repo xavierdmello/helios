@@ -1,4 +1,5 @@
 use crate::errors::ConsensusError;
+use crate::forktypes::Forks;
 use crate::types::{
     Bytes32, GenericUpdate, Header, LightClientStore, SignatureBytes, SyncAggregate, SyncCommittee,
 };
@@ -121,7 +122,7 @@ pub fn verify_generic_update(
     genesis_time: u64,
     store: LightClientStore,
     genesis_root: Vec<u8>,
-    fork_version: Vec<u8>,
+    forks: &Forks,
 ) -> Result<()> {
     let bits = get_bits(&update.sync_aggregate.sync_committee_bits);
     if bits == 0 {
@@ -196,7 +197,7 @@ pub fn verify_generic_update(
         &update.sync_aggregate.sync_committee_signature,
         update.signature_slot,
         genesis_root,
-        fork_version,
+        forks,
     );
 
     if !is_valid_sig {
@@ -219,13 +220,13 @@ fn verify_sync_committee_signture(
     signature: &SignatureBytes,
     signature_slot: u64,
     genesis_root: Vec<u8>,
-    fork_version: Vec<u8>,
+    forks: &Forks,
 ) -> bool {
     let res: Result<bool> = (move || {
         let pks: Vec<&PublicKey> = pks.iter().collect();
         let header_root = Bytes32::try_from(attested_header.clone().hash_tree_root()?.as_ref())?;
         let signing_root =
-            compute_committee_sign_root(header_root, signature_slot, genesis_root, fork_version)?;
+            compute_committee_sign_root(header_root, signature_slot, genesis_root, forks)?;
 
         Ok(is_aggregate_valid(signature, signing_root.as_ref(), &pks))
     })();
@@ -242,12 +243,29 @@ fn compute_committee_sign_root(
     header: Bytes32,
     slot: u64,
     genesis_root: Vec<u8>,
-    fork_version: Vec<u8>,
+    forks: &Forks,
 ) -> Result<Node> {
     let genesis_root = genesis_root.to_vec().try_into().unwrap();
 
     let domain_type = &hex::decode("07000000")?[..];
-    let fork_version = Vector::try_from(fork_version).map_err(|(_, err)| err)?;
+    let fork_version =
+        Vector::try_from(calculate_fork_version(forks, slot)).map_err(|(_, err)| err)?;
     let domain = compute_domain(domain_type, fork_version, genesis_root)?;
     compute_signing_root(header, domain)
+}
+
+pub fn calculate_fork_version(forks: &Forks, slot: u64) -> Vec<u8> {
+    let epoch = slot / 32;
+
+    if epoch >= forks.deneb.epoch {
+        forks.deneb.fork_version.clone()
+    } else if epoch >= forks.capella.epoch {
+        forks.capella.fork_version.clone()
+    } else if epoch >= forks.bellatrix.epoch {
+        forks.bellatrix.fork_version.clone()
+    } else if epoch >= forks.altair.epoch {
+        forks.altair.fork_version.clone()
+    } else {
+        forks.genesis.fork_version.clone()
+    }
 }

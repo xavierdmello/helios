@@ -68,6 +68,7 @@ impl Config {
                 }
                 exit(1);
             }
+            
         }
     }
 

@@ -317,6 +317,7 @@ dependencies = [
 name = "config"
 version = "0.5.5"
 dependencies = [
+ "common",
  "dirs",
  "ethers-core",
  "eyre",
@@ -341,6 +342,7 @@ dependencies = [
  "async-trait",
  "bytes",
  "chrono",
+ "common",
  "config",
  "ethers-core",
  "eyre",

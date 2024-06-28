@@ -7,8 +7,8 @@ use serde::de::DeserializeOwned;
 
 use super::ConsensusRpc;
 use crate::constants::MAX_REQUEST_LIGHT_CLIENT_UPDATES;
-use crate::types::*;
 use primitives::errors::RpcError;
+use primitives::types::{BeaconBlock, Bootstrap, FinalityUpdate, OptimisticUpdate, Update};
 
 #[derive(Debug)]
 pub struct NimbusRpc {
