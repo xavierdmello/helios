@@ -8,8 +8,9 @@ edition = "2021"
 ssz-rs.workspace = true
 
 # execution
-ethers-core.workspace = true
-
+revm.workspace = true
+ethers.workspace = true
+triehash-ethereum.workspace = true
 
 # async/futures
 futures.workspace = true
@@ -29,8 +30,9 @@ tracing.workspace = true
 thiserror.workspace = true
 hyper.workspace = true
 
-primitives = { path = "../primitives" }
+common = { path = "../common" }
 consensus = { path = "../consensus" }
+primitives = { path = "../primitives" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 openssl.workspace = true

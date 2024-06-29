@@ -60,9 +60,8 @@ pub mod config {
 
 pub mod types {
     pub use common::types::{Block, BlockTag, Transactions};
-    pub use execution::types::{Account, CallOpts};
+    pub use primitives::execution::types::{Account, CallOpts};
 }
-
 pub mod errors {
     pub use execution::errors::*;
     pub use primitives::errors::*;
@@ -74,6 +73,11 @@ pub mod prelude {
     pub use crate::types::*;
 }
 
-pub mod primitives {
-    pub use primitives::*;
+pub mod errors {
+    pub use primitives::errors::*;
+    pub use primitives::execution::errors::*;
+}
+
+pub mod constants {
+    pub use primitives::execution::constants::*;
 }
