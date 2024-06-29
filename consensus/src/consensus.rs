@@ -37,7 +37,7 @@ use primitives::types::{
     SignatureBytes, Update,
 };
 use primitives::utils::{
-    calc_sync_period, compute_domain, compute_signing_root,  is_aggregate_valid, is_proof_valid,
+    calc_sync_period, compute_domain, compute_signing_root, is_aggregate_valid, is_proof_valid,
 };
 
 pub struct ConsensusClient<R: ConsensusRpc, DB: Database> {
@@ -366,7 +366,6 @@ impl<R: ConsensusRpc> Inner<R> {
         Duration::try_seconds(next_update as i64).unwrap()
     }
 
-    // TOOD: use bootstrap_from
     pub async fn bootstrap(&mut self, checkpoint: &[u8]) -> Result<()> {
         let mut bootstrap = self
             .rpc
