@@ -215,7 +215,6 @@ fn verify_sync_committee_signture(
     }
 }
 
-// TODO: Pass in config instead of individual parameters
 fn compute_committee_sign_root(
     header: Bytes32,
     slot: u64,
