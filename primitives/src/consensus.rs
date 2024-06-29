@@ -85,7 +85,6 @@ pub fn verify_generic_update(
     genesis_root: Vec<u8>,
     forks: &Forks,
 ) -> Result<()> {
-    println!("verifying update");
     let bits = get_bits(&update.sync_aggregate.sync_committee_bits);
     if bits == 0 {
         return Err(ConsensusError::InsufficientParticipation.into());
@@ -166,8 +165,6 @@ pub fn verify_generic_update(
         return Err(ConsensusError::InvalidSignature.into());
     }
 
-    println!("update is valid!");
-
     Ok(())
 }
 
@@ -191,7 +188,7 @@ pub fn expected_current_slot(now: SystemTime, genesis_time: u64) -> u64 {
     since_genesis.as_secs() / 12
 }
 
-fn verify_sync_committee_signture(
+pub fn verify_sync_committee_signture(
     pks: &[PublicKey],
     attested_header: &Header,
     signature: &SignatureBytes,
@@ -215,7 +212,7 @@ fn verify_sync_committee_signture(
     }
 }
 
-fn compute_committee_sign_root(
+pub fn compute_committee_sign_root(
     header: Bytes32,
     slot: u64,
     genesis_root: Vec<u8>,

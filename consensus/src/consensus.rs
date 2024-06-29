@@ -29,8 +29,9 @@ use primitives::errors::ConsensusError;
 use primitives::types::LightClientStore;
 
 use primitives::consensus::{
-    get_bits, get_participating_keys, is_current_committee_proof_valid, is_finality_proof_valid,
-    is_next_committee_proof_valid, verify_generic_update,
+    compute_committee_sign_root, get_bits, get_participating_keys,
+    is_current_committee_proof_valid, is_finality_proof_valid, is_next_committee_proof_valid,
+    verify_generic_update, verify_sync_committee_signture,
 };
 use primitives::types::{
     Bytes32, ExecutionPayload, FinalityUpdate, GenericUpdate, Header, OptimisticUpdate,
@@ -603,30 +604,23 @@ impl<R: ConsensusRpc> Inner<R> {
         signature: &SignatureBytes,
         signature_slot: u64,
     ) -> bool {
-        let res: Result<bool> = (move || {
-            let pks: Vec<&PublicKey> = pks.iter().collect();
-            let header_root =
-                Bytes32::try_from(attested_header.clone().hash_tree_root()?.as_ref())?;
-            let signing_root = self.compute_committee_sign_root(header_root, signature_slot)?;
-
-            Ok(is_aggregate_valid(signature, signing_root.as_ref(), &pks))
-        })();
-
-        if let Ok(is_valid) = res {
-            is_valid
-        } else {
-            false
-        }
+        verify_sync_committee_signture(
+            pks,
+            attested_header,
+            signature,
+            signature_slot,
+            self.config.chain.genesis_root.to_vec(),
+            &self.config.forks,
+        )
     }
 
     fn compute_committee_sign_root(&self, header: Bytes32, slot: u64) -> Result<Node> {
-        let genesis_root = self.config.chain.genesis_root.to_vec().try_into().unwrap();
-
-        let domain_type = &hex::decode("07000000")?[..];
-        let fork_version =
-            Vector::try_from(self.config.fork_version(slot)).map_err(|(_, err)| err)?;
-        let domain = compute_domain(domain_type, fork_version, genesis_root)?;
-        compute_signing_root(header, domain)
+        compute_committee_sign_root(
+            header,
+            slot,
+            self.config.chain.genesis_root.to_vec(),
+            &self.config.forks,
+        )
     }
 
     fn age(&self, slot: u64) -> Duration {

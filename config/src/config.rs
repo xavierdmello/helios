@@ -1,17 +1,17 @@
 use crate::base::BaseConfig;
 use crate::cli::CliConfig;
-use primitives::forktypes::{ChainConfig, Forks};
-use primitives::utils::{bytes_deserialize, bytes_opt_deserialize};
 use crate::Network;
 use figment::{
     providers::{Format, Serialized, Toml},
     Figment,
 };
+use primitives::consensus::calculate_fork_version;
+use primitives::forktypes::{ChainConfig, Forks};
+use primitives::utils::{bytes_deserialize, bytes_opt_deserialize};
 use serde::Deserialize;
 use std::net::{IpAddr, Ipv4Addr};
 use std::str::FromStr;
 use std::{path::PathBuf, process::exit};
-
 #[derive(Deserialize, Debug, Default)]
 pub struct Config {
     pub consensus_rpc: String,
@@ -68,24 +68,11 @@ impl Config {
                 }
                 exit(1);
             }
-
         }
     }
 
     pub fn fork_version(&self, slot: u64) -> Vec<u8> {
-        let epoch = slot / 32;
-
-        if epoch >= self.forks.deneb.epoch {
-            self.forks.deneb.fork_version.clone()
-        } else if epoch >= self.forks.capella.epoch {
-            self.forks.capella.fork_version.clone()
-        } else if epoch >= self.forks.bellatrix.epoch {
-            self.forks.bellatrix.fork_version.clone()
-        } else if epoch >= self.forks.altair.epoch {
-            self.forks.altair.fork_version.clone()
-        } else {
-            self.forks.genesis.fork_version.clone()
-        }
+        calculate_fork_version(&self.forks, slot)
     }
 
     pub fn to_base_config(&self) -> BaseConfig {
