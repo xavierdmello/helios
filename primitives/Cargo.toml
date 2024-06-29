@@ -7,11 +7,12 @@ edition = "2021"
 eyre.workspace = true
 ssz-rs.workspace = true
 hex.workspace = true
-serde = { version = "1.0.195", features = ["derive"] }
-serde_json = "1.0.111"
-superstruct = "0.8.0"
-thiserror = "1.0.61"
+serde.workspace = true
+serde_json.workspace = true
+superstruct.workspace = true
+thiserror.workspace = true
 milagro_bls.workspace = true
 ethers-core.workspace = true
-common = { path = "../common" }
 zduny-wasm-timer = "0.2.8"
+
+common = { path = "../common" }
