@@ -13,6 +13,6 @@ superstruct.workspace = true
 thiserror.workspace = true
 milagro_bls.workspace = true
 ethers-core.workspace = true
-zduny-wasm-timer = "0.2.8"
+zduny-wasm-timer.workspace = true
 
 common = { path = "../common" }
