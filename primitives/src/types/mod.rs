@@ -3,9 +3,9 @@ use ssz_rs::prelude::*;
 
 use superstruct::superstruct;
 
-pub use self::type_primitives::{BlockTag, ByteList, ByteVector, U64};
+pub use self::primitives::{BlockTag, ByteList, ByteVector, U64};
 use self::utils::{header_deserialize, superstruct_ssz, u256_deserialize};
-mod type_primitives;
+mod primitives;
 mod utils;
 use serde;
 
