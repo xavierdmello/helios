@@ -5,14 +5,18 @@ edition = "2021"
 
 [workspace]
 members = [
+    "cli",
+    "client",
+    "common",
     "config",
     "consensus",
     "execution",
     "primitives",
-    "common"
+    "common",
+    "helios-ts",
 ]
 
-
+default-members = ["cli"]
 
 ######################################
 # Workspace Dependencies
