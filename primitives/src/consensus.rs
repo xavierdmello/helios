@@ -200,10 +200,10 @@ pub fn verify_sync_committee_signture(
     let res: Result<bool> = (move || {
         let pks: Vec<&PublicKey> = pks.iter().collect();
         let header_root = Bytes32::try_from(attested_header.clone().hash_tree_root()?.as_ref())?;
-        println!("cycle-tracker-start: compute_committee_sign_root");   
+        println!("cycle-tracker-start: computeroot");   
         let signing_root =
             compute_committee_sign_root(header_root, signature_slot, genesis_root, forks)?;
-        println!("cycle-tracker-end: compute_committee_sign_root");
+        println!("cycle-tracker-end: computeroot");
 
         Ok(is_aggregate_valid(signature, signing_root.as_ref(), &pks))
     })();
