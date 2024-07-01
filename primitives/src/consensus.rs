@@ -17,12 +17,24 @@ pub fn get_participating_keys(
     bitfield: &Bitvector<512>,
 ) -> Result<Vec<PublicKey>> {
     let mut pks: Vec<PublicKey> = Vec::new();
+    println!("cycle-tracker-start: enumerate");
     bitfield.iter().enumerate().for_each(|(i, bit)| {
+        println!("cycle-tracker-end: enumerate");
+        println!("cycle-tracker-start: bit");
         if bit == true {
+            println!("cycle-tracker-start: pk_retrieval");
             let pk = &committee.pubkeys[i];
+            println!("cycle-tracker-end: pk_retrieval");
+
+            println!("cycle-tracker-start: pk_conversion");
             let pk = PublicKey::from_bytes_unchecked(pk).unwrap();
+            println!("cycle-tracker-end: pk_conversion");
+
+            println!("cycle-tracker-start: pk_push");
             pks.push(pk);
+            println!("cycle-tracker-end: pk_push");
         }
+        println!("cycle-tracker-end: bit");
     });
 
     Ok(pks)
