@@ -15,4 +15,3 @@ milagro_bls.workspace = true
 ethers-core.workspace = true
 zduny-wasm-timer.workspace = true
 bytes.workspace = true
-common = { path = "../common" }
